@@ -29,14 +29,8 @@
       cursor: pointer;
       font-size: 15px;
     }
-    .google {
-      background: #4285F4;
-      color: #fff;
-    }
-    .agree {
-      background: #111;
-      color: #fff;
-    }
+    .google { background: #4285F4; color: #fff; }
+    .agree { background: #111; color: #fff; }
     .hidden { display: none; }
     .terms {
       text-align: left;
@@ -77,14 +71,14 @@
 
 </div>
 
-<!-- Supabase JS -->
+<!-- SUPABASE JS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script>
-  // --- REPLACE THESE WITH YOUR SUPABASE INFO ---
-  const SUPABASE_URL = "https://hrcobmmnccvrmerfaiky.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhyY29ibW1uY2N2cm1lcmZhaWt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MTMzNTQsImV4cCI6MjA4NDQ4OTM1NH0.OOCtagJlwcvbWK3qYjX-pBk4Ijf9SQyIngYaps5fRWk";
+  // --- REPLACE WITH YOUR SUPABASE INFO ---
+  const SUPABASE_URL = "https://hrcobmmnccvrmerfaiky.supabase.co";           // e.g., https://xxxxxx.supabase.co
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhyY29ibW1uY2N2cm1lcmZhaWt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MTMzNTQsImV4cCI6MjA4NDQ4OTM1NH0.OOCtagJlwcvbWK3qYjX-pBk4Ijf9SQyIngYaps5fRWk";   // from Supabase → Settings → API
   const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  // ---------------------------------------------
+  // ----------------------------------------
 
   const loginScreen = document.getElementById("login-screen");
   const termsScreen = document.getElementById("terms-screen");
@@ -93,9 +87,7 @@
   async function login() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: {
-        redirectTo: "https://macteir.netlify.app/auth.html"
-      }
+      options: { redirectTo: "https://macteir.netlify.app/auth.html" }
     });
     if (error) console.error("Login error:", error.message);
   }
@@ -109,7 +101,7 @@
     const { data: user } = await supabase.auth.getUser();
     if (!user) return;
 
-    // Save or update user in your table
+    // Save or update user in the 'users' table
     await supabase.from("users").upsert({
       id: user.id,
       email: user.email,
@@ -124,9 +116,9 @@
   window.onload = async () => {
     const { data: user } = await supabase.auth.getUser();
 
-    if (!user) return; // no one logged in
+    if (!user) return; // not logged in
 
-    // Check if user exists in DB
+    // Check if user exists and has accepted terms
     const { data: dbUser } = await supabase
       .from("users")
       .select("*")
