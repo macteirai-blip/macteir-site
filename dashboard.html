@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MacTeir Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #4285F4;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .container {
+      padding: 30px;
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      margin-top: 50px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    img.avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin-top: 15px;
+    }
+    button.logout {
+      background: #111;
+      color: #fff;
+      border: none;
+      padding: 12px 25px;
+      margin-top: 20px;
+      font-size: 15px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>MacTeir Dashboard</h1>
+</header>
+
+<div class="container" id="dashboard">
+  <h2>Loading user info...</h2>
+</div>
+
+<!-- SUPABASE JS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script>
+  const SUPABASE_URL = "YOUR_SUPABASE_URL";           // Replace
+  const SUPABASE_ANON_KEY = "YOUR_ANON_PUBLIC_KEY";   // Replace
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const dashboardDiv = document.getElementById("dashboard");
+
+  async function logout() {
+    await supabase.auth.signOut();
+    window.location.href = "/auth.html";
+  }
+
+  window.onload = async () => {
+    const { data: user } = await supabase.auth.getUser();
+
+    // Block access if not logged in
+    if (!user) {
+      window.location.href = "/auth.html";
+      return;
+    }
+
+    // Fetch user from your DB
+    const { data: dbUser } = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    if (!dbUser) {
+      // No account → force logout
+      window.location.href = "/auth.html";
+      return;
+    }
+
+    // Build dashboard HTML
+    dashboardDiv.innerHTML = `
+      <h2>Welcome, ${dbUser.name} 👋</h2>
+      <p>Email: ${dbUser.email}</p>
+      <img src="${dbUser.avatar}" class="avatar" alt="Avatar">
+      <br>
+      <button class="logout" onclick="logout()">Logout</button>
+    `;
+  };
+</script>
+
+</body>
+</html>
